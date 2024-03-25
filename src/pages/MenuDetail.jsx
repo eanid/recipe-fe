@@ -1,16 +1,17 @@
 import { Navbar } from "../component/Navbar";
 import axios from "axios";
 import { useState,useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const base_url = import.meta.env.VITE_BASE_URL
 
 const Menu = () => {
-	const [data,setData] = useState([])
+	const [data,setData] = useState(null)
+	const {id} = useParams()
 	
 	async function getData() {
 		try{
-			let res = await axios.get(`${base_url}/recipes`)
+			let res = await axios.get(`${base_url}/recipes/${id}`)
 			console.log(res.data.data)
 			setData(res.data.data)
 		} catch(err){
@@ -20,6 +21,7 @@ const Menu = () => {
 
 	useEffect(()=>{
 		getData()
+		console.log(id)
 	},[])
 
 	useEffect(()=>{
@@ -31,20 +33,14 @@ const Menu = () => {
         <div>
             <Navbar />
             <h1 style={{ color: "black" }} onClick={()=>getData()}>Menu</h1>
-			{data.length ? data.map((item,index)=>(
-					<div className="alert-primary" key={index}>
+					<div className="alert-primary" >
 				<h3>
-					{item.title}
+					{data ? (data.title ? data.title : null) : null}
 				</h3>
 				<p>
-					{item.ingredient}
+					{data?.ingredient}
 				</p>
-				<Link to={`/menu/${item.id}`}>
-				<p>detail</p>
-				</Link>
 				</div>
-					)
-			) : null}
         </div>
     );
 };

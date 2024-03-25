@@ -3,6 +3,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Navbar } from "./component/Navbar";
 import Menu from "./pages/Menu";
+import MenuDetail from "./pages/MenuDetail";
+import MenuCreate from "./pages/MenuCreate";
 
 const Profile = () => {
     return (
@@ -38,6 +40,8 @@ const App = () => {
                     <Route path="/home" element={<Home />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/menu" element={<Menu />} />
+                    <Route path="/menu/:id" element={<MenuDetail />} />
+                    <Route path="/menu-create" element={<MenuCreate />} />
                 </Routes>
             </BrowserRouter>
         </>
