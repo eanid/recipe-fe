@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "../component/Navbar";
-import axios from "axios";
-
-const base_url = import.meta.env.VITE_BASE_URL
-const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzYTQ1NDU4LTgyYjUtNDczZi1iMjhkLTJiN2E2YzA5ZDUwYSIsImVtYWlsIjoiY2VjaWxAZ21haWwuY29tIiwicGhvdG8iOm51bGwsImNyZWF0ZWRfYXQiOiIyMDI0LTAzLTA4VDA4OjQyOjQ4LjQ3NloiLCJpYXQiOjE3MDk4ODQzMjd9.qKCs1JT4Pwdfb96ubhFBfKQjJP7lJhjJ4plrTffia7s";
+import { useDispatch, useSelector } from "react-redux";
+import { postMenu } from "../redux/action/menu";
 
 const MenuCreate = () => {
+	const dispatch = useDispatch()
+	const menu_post = useSelector((state)=>state.menu_post)
     const navigate = useNavigate();
     const [photo, setPhoto] = useState();
     const [inputData, setInputData] = useState({
@@ -25,19 +24,7 @@ const MenuCreate = () => {
 		bodyData.append("category_id",inputData.category_id)
 		bodyData.append("photo",photo)
 
-		axios.post(base_url+"/recipes",bodyData,{
-			headers: {
-				"Authorization" : `Bearer ${token}`,
-				"Content-Type": "multipart/form-data"
-			}
-		}).then((res)=>{
-			console.log("success")
-			console.log(res)
-			navigate("/menu")
-		}).catch((err)=>{
-			console.log("failed")
-			console.log(err)
-		})
+		dispatch(postMenu(bodyData,navigate))
 	}
 
 	const onChange = (e) => {
@@ -73,6 +60,12 @@ const MenuCreate = () => {
 					</button>
 				</form>
             </div>
+			{menu_post.isLoading ? 
+			<div className="alert alert-primary">loading ...</div>
+			: null}
+			{menu_post.isError ? 
+			<div className="alert alert-danger">Post Menu Failed : {menu_post.ErrorMessage ?? "-"}</div>
+			: null}
         </div>
     );
 };

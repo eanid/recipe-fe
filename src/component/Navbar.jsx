@@ -1,46 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-const base_url = import.meta.env.VITE_BASE_URL;
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { authLogout } from "../redux/action/auth";
 
 export const Navbar = () => {
-    const [token,setToken] = useState(null)
-
-    useEffect(()=>{
-      let getToken = localStorage.getItem("token")
-      setToken(getToken)
-    },[localStorage])
-
-    const login = () => {
-        axios
-            .post(
-                base_url + "/auth/login",
-                {
-                    email: "zerfean@gmail.com",
-                    password: "123123",
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                }
-            )
-            .then((res) => {
-                console.log("success login");
-                console.log(res.data.token);
-                localStorage.setItem("token",res.data.token)
-                setToken(res.data.token)
-            })
-            .catch((err) => {
-                console.log("failed login");
-                console.log(err);
-            });
-    };
+    const navigate = useNavigate();
+    const dispatch = useDispatch()
+    const authdata = useSelector((state) => state.auth.data);
 
     const logout = () => {
-      localStorage.clear()
-      setToken(null)
-    }
+        dispatch(authLogout())
+        navigate("/login");
+    };
 
     return (
         <>
@@ -89,22 +60,40 @@ export const Navbar = () => {
                                     Profile
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <Link
-                                    to="/menu-create"
-                                    className="nav-link"
-                                    aria-current="page"
-                                >
-                                    Add Menu
-                                </Link>
-                            </li>
+                            {authdata ? (
+                                <li className="nav-item">
+                                    <Link
+                                        to="/menu-create"
+                                        className="nav-link"
+                                        aria-current="page"
+                                    >
+                                        Add Menu
+                                    </Link>
+                                </li>
+                            ) : null}
                         </ul>
                     </div>
-                    <button className="btn btn-primary" onClick={token ? logout : login}>
-                        {token ? "logout" : "login"}
-                    </button>
+                    {authdata ? 
+                    (
+                        <p>
+                            {authdata?.data?.email ?? " - "}
+                        </p>
+                    )
+                    : null}
+                    {authdata ? (
+                        <button
+                            className="btn btn-danger"
+                            onClick={() => logout()}
+                        >
+                            logout
+                        </button>
+                    ) : (
+                        <Link to="/login">
+                            <button className="btn btn-primary">login</button>
+                        </Link>
+                    )}
                 </div>
             </nav>
-        </>                
+        </>
     );
 };
